@@ -17,3 +17,5 @@
 .ledger-demo{font:8px var(--mono);letter-spacing:.5px;color:#a6e7b7;border:1px solid #365340;background:#203326;padding:5px 6px;border-radius:4px;white-space:nowrap}
 .ledger-demo.blocked{color:#f0a1a1;border-color:#583737;background:#392424}
 @media(max-width:600px){.ledger-row{gap:7px;flex-wrap:wrap}.ledger-main{min-width:calc(100% - 75px)}.ledger-value{margin-left:59px;text-align:left}.ledger-demo{margin-left:auto}}
+
+.red-text{color:#ef8d8d!important}

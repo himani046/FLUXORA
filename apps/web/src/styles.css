@@ -19,3 +19,5 @@
 @media(max-width:600px){.ledger-row{gap:7px;flex-wrap:wrap}.ledger-main{min-width:calc(100% - 75px)}.ledger-value{margin-left:59px;text-align:left}.ledger-demo{margin-left:auto}}
 
 .red-text{color:#ef8d8d!important}
+
+.market-select{max-width:210px;min-width:150px;background:#171c19;color:#a9d7b8;border:1px solid #343d37;border-radius:6px;padding:7px 26px 7px 9px;font:inherit;font-size:11px;outline:none;cursor:pointer}.market-select:focus{border-color:#9ce5b8;box-shadow:0 0 0 2px #9ce5b822}.market-select option{background:#171c19;color:#e6eee8}.pair-line{flex-wrap:wrap}.chart-loading{height:100%;min-height:240px;display:flex;align-items:center;justify-content:center;color:#9aa69e;font-size:13px}

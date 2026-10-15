@@ -5,7 +5,7 @@ const prices=[63250,63380,63210,63520,63460,63710,63600,63940,63820,64120,64010,
 const chartData=prices.map((price,i)=>({time:i,price}));
 const money=n=>n.toLocaleString('en-US',{maximumFractionDigits:2,minimumFractionDigits:2});
 export default function App(){
- const [side,setSide]=useState('Long'),[size,setSize]=useState('2500'),[leverage,setLeverage]=useState(3),[tab,setTab]=useState('Positions'),[modal,setModal]=useState(false),[expanded,setExpanded]=useState(true),[notice,setNotice]=useState(''),[feedSafe,setFeedSafe]=useState(true);
+ const [side,setSide]=useState('Long'),[size,setSize]=useState('2500'),[leverage,setLeverage]=useState(3),[tab,setTab]=useState('Positions'),[modal,setModal]=useState(false),[expanded,setExpanded]=useState(true),[notice,setNotice]=useState(''),[feedSafe,setFeedSafe]=useState(true),[oracleJump,setOracleJump]=useState(false);
  const notional=Math.max(0,Number(size)||0)*leverage, margin=notional/leverage, fee=notional*.0005;
  const checks=useMemo(()=>[
   {label:'Collateral requirement',desc:margin>0&&margin<=10000?'Available demo collateral covers initial margin':'Enter a positive margin within the demo collateral limit',pass:margin>0&&margin<=10000},

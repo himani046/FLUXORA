@@ -1,42 +1,73 @@
 # FLUXORA — Guarded Onchain Perpetuals
 
-Where every trade earns its trust.
+**Every trade earns its trust.** FLUXORA pairs a human-readable Guarded Execution Receipt with an experimental EVM perpetuals sandbox.
 
-Fluxora is a hackathon prototype for a safer, more legible onchain perpetual-futures workflow. Its proposed differentiator is a human-readable **Guarded Execution Receipt**: preview collateral, leverage, notional exposure, oracle freshness, price deviation, and explicit reasons an order would be blocked.
+## What is in this repository
 
-> Prototype status: the web UI uses simulated market data and does not submit trades. The Solidity contract is educational and unaudited. Do not use real funds or deploy to mainnet.
+- `apps/web/`: React/Vite trading terminal with public Binance USDⓈ-M Futures reference data, market selector, risk scenario lab, local receipt history, wallet connect, and optional contract actions when configured.
+- `contracts/FluxoraPerps.sol`: experimental isolated-margin contract with ERC-20 collateral deposits, publisher-fed mark prices, onchain leverage/margin/notional/oracle-age/deviation checks, persistent accepted/rejected receipts, open/close lifecycle, simple funding index, and a liquidation entry point.
+- `contracts/MockCollateral.sol`: faucet token for local/testnet demos only.
+- `test/FluxoraPerps.js`: initial contract tests.
+- `docs/RESEARCH_AND_ROADMAP.md`: research framing, limitations, and evaluation plan.
 
-## Why this angle?
+## Status — read before demoing
 
-Onchain order books, perpetual futures, funding, margin, oracle feeds, and settlement already exist in the ecosystem. Fluxora should not claim these features alone are novel. The hackathon hypothesis is narrower: **Can a pre-trade receipt that explains risk decisions reduce misunderstood trades while staying consistent with onchain validation?** This should be tested rather than presented as a proven research gap.
+This is a **testnet/local hackathon prototype, not a production exchange**. The code has been committed, but this repository update has not itself deployed contracts, run the tests, completed a browser build, or verified a transaction on an explorer. Do not claim those checks passed until you run them and capture the evidence.
 
-## Existing-system limitations to address
-- Risk outcomes can be hard for traders to understand before signing.
-- Stale or discontinuous oracle data creates unsafe execution conditions.
-- Leverage can hide notional exposure and price-move sensitivity.
-- Transactions may be delayed, reverted, reordered, or exposed to MEV; settlement is not automatically instant.
-- Permissionless code is not automatically safe; contract, oracle, governance, and composability risks remain.
+The dashboard uses Binance public API data for its live reference market feed. That feed is offchain. The contract price is separately published by a configured trusted publisher; it is **not** a decentralized oracle. The mock collateral has no real value.
 
-Fluxora surfaces those trade-offs with explicit fail reasons rather than claiming to eliminate them.
+The contract is not audited. It is a demonstration of risk-gated transaction flow, not a complete or economically safe perpetuals exchange: it has no matching engine, external counterparty/insurance pool, robust oracle, robust funding economics, fee model, or production-grade liquidation incentives. PnL accounting and liquidation economics need independent review before any real-asset use. Never use mainnet funds.
 
-## Repository
-- `apps/web/`: responsive React + Vite market/trade dashboard
-- `contracts/FluxoraGuard.sol`: educational Solidity pre-trade risk gate
-- `docs/RESEARCH_AND_ROADMAP.md`: thesis, limitations, evaluation and roadmap
+## Run the frontend
 
-## Run the UI
 Requires Node.js 20+.
 
-```bash
+```powershell
 cd apps/web
 npm install
+# Optional: configure these in apps/web/.env.local after deployment
+# VITE_FLUXORA_CHAIN_ID=11155111
+# VITE_FLUXORA_CONTRACT_ADDRESS=0x...
+# VITE_FLUXORA_COLLATERAL_ADDRESS=0x...
 npm run dev
 ```
 
-All market values and the receipt are demo-only. Wallet and live chain integration are not yet enabled.
+Without contract addresses, the UI remains in simulation mode. A connected wallet alone does not turn a simulated receipt into an onchain receipt.
 
-## Contract scope
-This is not a full perpetuals exchange. It does not custody tokens, match orders, calculate funding, open positions, liquidate positions, or settle trades. The price publisher is trusted and centralized for the prototype. Tests, robust oracle integration, frontend/contract parity, and an independent audit are required before deployment.
+## Compile and test the contracts
+
+From the repository root:
+
+```powershell
+npm install
+npm run contracts:compile
+npm run contracts:test
+```
+
+The contract suite is an initial smoke-test suite, not a security audit.
+
+## Deploy to Sepolia (testnet only)
+
+1. Install dependencies at the repository root.
+2. Copy `.env.example` to `.env`.
+3. Set `SEPOLIA_RPC_URL` and `DEPLOYER_PRIVATE_KEY`. Use a dedicated test wallet with no valuable assets; never commit `.env`.
+4. Fund that wallet with Sepolia test ETH.
+5. Run:
+
+```powershell
+npm run contracts:deploy:sepolia
+```
+
+6. Save the printed `MockCollateral` and `FluxoraPerps` addresses. Set the corresponding `VITE_FLUXORA_...` values in `apps/web/.env.local`, then restart Vite.
+7. Connect the deployer/publisher wallet, choose a market, and click **Publish mark price**. This action explicitly trusts that wallet to publish the reference price. Repeat when the price becomes stale.
+8. Click **Deposit 1,000 test tokens**, approve the token in the wallet if requested, and then submit a small test order. The first contract deployment is not automatically published to a block explorer by this repository; use the transaction hash and the Sepolia explorer to verify it.
+
+The deployment script deploys the mock token and exchange contract only. It does not fund the wallet, verify source code, run the frontend, or make the trusted publisher decentralized.
+
+## Product thesis
+
+The hypothesis is that a pre-trade receipt with explicit reasons for a pass or block may make leverage, collateral, oracle freshness, and price deviation easier to understand. This is a hypothesis to evaluate, not a proven novelty claim. Measure task completion, risk comprehension, and agreement between the UI preview and contract outcomes against a baseline.
 
 ## Safety
-Perpetual futures are high risk. This is software experimentation, not financial advice. Never use real assets with this prototype.
+
+Perpetual futures are high risk. This software is for engineering experimentation and is not financial advice. Use only test tokens on a test network. Do not deploy this prototype with real assets.

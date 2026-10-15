@@ -67,7 +67,7 @@ contract FluxoraPerps {
         collateral[msg.sender] -= amount; emit CollateralWithdrawn(msg.sender, amount);
     }
     function publishPrice(bytes32 market, uint192 valueE6, uint64 updatedAt) external onlyPublisher {
-        if (valueE6 == 0 || updatedAt > block.timestamp) revert InvalidConfig();
+        if (valueE6 == 0 || valueE6 > type(uint128).max || updatedAt > block.timestamp) revert InvalidConfig();
         prices[market] = Price(valueE6, updatedAt); emit PricePublished(market, valueE6, updatedAt);
     }
     function publishFundingIndex(bytes32 market, int256 cumulativeBps) external onlyPublisher {
@@ -91,7 +91,7 @@ contract FluxoraPerps {
         uint256 marginE6 = uint256(notionalE6) * BPS / leverageBps;
         collateral[msg.sender] -= marginE6;
         positionId = nextPositionId++;
-        positions[positionId] = Position(msg.sender, market, isLong, true, notionalE6, p.valueE6, uint128(marginE6), leverageBps, cumulativeFundingBps[market]);
+        positions[positionId] = Position(msg.sender, market, isLong, true, notionalE6, uint128(p.valueE6), uint128(marginE6), leverageBps, cumulativeFundingBps[market]);
         traderPositions[msg.sender].push(positionId);
         emit PositionOpened(positionId, msg.sender, market, isLong, notionalE6, marginE6, p.valueE6);
     }

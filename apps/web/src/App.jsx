@@ -8,9 +8,10 @@ export default function App(){
  const [side,setSide]=useState('Long'),[size,setSize]=useState('2500'),[leverage,setLeverage]=useState(3),[tab,setTab]=useState('Positions'),[modal,setModal]=useState(false),[expanded,setExpanded]=useState(true),[notice,setNotice]=useState(''),[feedSafe,setFeedSafe]=useState(true);
  const notional=Math.max(0,Number(size)||0)*leverage, margin=notional/leverage, fee=notional*.0005;
  const checks=useMemo(()=>[
-  {label:'Collateral requirement',desc:'Available demo collateral covers initial margin',pass:margin<=10000},
+  {label:'Collateral requirement',desc:margin>0&&margin<=10000?'Available demo collateral covers initial margin':'Enter a positive margin within the demo collateral limit',pass:margin>0&&margin<=10000},
   {label:'Leverage policy',desc:'Within Fluxora demo limit of 5×',pass:leverage<=5},
   {label:'Oracle freshness',desc:feedSafe?'Price observation is within demo freshness threshold':'Price observation is stale — new orders blocked',pass:feedSafe},
+  {label:'Price deviation',desc:oracleJump?'Reference price differs from oracle by more than the demo threshold':'Reference price is within the demo deviation threshold',pass:!oracleJump},
   {label:'Exposure ceiling',desc:'Position stays below the $50,000 demo notional cap',pass:notional<=50000}
  ],[margin,leverage,feedSafe,notional]);
  const safe=checks.every(c=>c.pass), notify=m=>{setNotice(m);window.setTimeout(()=>setNotice(''),3800)};
